@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var navigationView: NavigationView
     lateinit var coordinatorLayout: CoordinatorLayout
     lateinit var toolbar: androidx.appcompat.widget.Toolbar
+    var previousMenuItem: MenuItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,13 +31,14 @@ class MainActivity : AppCompatActivity() {
         coordinatorLayout = findViewById(R.id.coordinatorLayout)
         toolbar = findViewById(R.id.toolbar)
         setUpToolBar()
+        openDashBoard()
         val actionBarDrawerToggle = ActionBarDrawerToggle(
             this@MainActivity,
             drawerLayout,
             R.string.open_drawer,
             R.string.close_drawer
         )
-        
+
         drawerLayout.addDrawerListener(actionBarDrawerToggle)
         //to change home button(arrow) to hamburger icon and vice versa on opening and closing of navigation drawer
         actionBarDrawerToggle.syncState()
@@ -44,22 +46,41 @@ class MainActivity : AppCompatActivity() {
         //to set click listener on menu items
         navigationView.setNavigationItemSelectedListener {
             //it represents the current selected item
+
+            //code for highlighting the current menu item which it points to
+            if (previousMenuItem != null) {
+                //uncheck the previous menu item
+                previousMenuItem?.isChecked = false
+            }
+            it.isCheckable = true
+            it.isChecked = true
+            previousMenuItem = it
+
             when (it.itemId) {
                 R.id.dashboard -> {
-                    Toast.makeText(this@MainActivity, "Dashboard is clicked", Toast.LENGTH_LONG)
-                        .show()
+                    openDashBoard()
+                    drawerLayout.closeDrawers()
                 }
                 R.id.profile -> {
-                    Toast.makeText(this@MainActivity, "Profile is clicked", Toast.LENGTH_LONG)
-                        .show()
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.frame, ProfileFragment())
+                        .commit()
+                    supportActionBar?.title = "Profile"
+                    drawerLayout.closeDrawers()
                 }
                 R.id.about_app -> {
-                    Toast.makeText(this@MainActivity, "About App is clicked", Toast.LENGTH_LONG)
-                        .show()
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.frame, AboutAppFragment())
+                        .commit()
+                    supportActionBar?.title = "About App"
+                    drawerLayout.closeDrawers()
                 }
                 R.id.favourites -> {
-                    Toast.makeText(this@MainActivity, "Favourites is clicked", Toast.LENGTH_LONG)
-                        .show()
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.frame, FavouritesFragment())
+                        .commit()
+                    supportActionBar?.title = "Favourites"
+                    drawerLayout.closeDrawers()
                 }
 
             }
@@ -82,5 +103,24 @@ class MainActivity : AppCompatActivity() {
             drawerLayout.openDrawer(GravityCompat.START)
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun openDashBoard() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.frame, DashBoardFragment())
+            .commit()
+        supportActionBar?.title = "DashBoard"
+        //highlighting the dashboard icon when dashboard fragment is opened
+        navigationView.setCheckedItem(R.id.dashboard)
+    }
+
+    override fun onBackPressed() {
+        //frag holds the current fragment
+        val frag = supportFragmentManager.findFragmentById(R.id.frame)
+        when (frag) {
+            //if we are on some other fragment then on pressing back button we will come to dashboard fragment
+            !is DashBoardFragment -> openDashBoard()
+            else -> super.onBackPressed() //default functionality that is exit the app
+        }
     }
 }
