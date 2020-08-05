@@ -1,22 +1,26 @@
 package com.yuktachauhan.bookhub.fragment
 
+import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.yuktachauhan.bookhub.R
 import com.yuktachauhan.bookhub.adapter.RecyclerDashboardAdapter
 import com.yuktachauhan.bookhub.model.Book
+import com.yuktachauhan.bookhub.util.ConnectionManager
 
 class DashBoardFragment : Fragment() {
 
     lateinit var recyclerDashboard:RecyclerView
     lateinit var layoutManager:RecyclerView.LayoutManager
+    lateinit var btnCheckInternet:Button
 
     val bookInfoList = arrayListOf<Book>(
         Book("P.S. I love You", "Cecelia Ahern", "Rs. 299", "4.5", R.drawable.ps_ily),
@@ -42,6 +46,41 @@ class DashBoardFragment : Fragment() {
         // Inflate the layout for this fragment
         //false - because we don;t want to attach this fragment permanently to the activity,we will change
         val view = inflater.inflate(R.layout.fragment_dash_board, container, false)
+        //checking connectivity of the device to the internet
+        btnCheckInternet=view.findViewById(R.id.btnCheckInternet)
+        btnCheckInternet.setOnClickListener {
+            if(ConnectionManager().checkConnectivity(activity as Context)){
+                //if connected
+                val dialog=AlertDialog.Builder(activity as Context)
+                dialog.setTitle("Success")
+                dialog.setMessage("Internet Connection found")
+                dialog.setPositiveButton("Ok"){
+                    text,listener->
+                    //do nothing
+                }
+                dialog.setNegativeButton("Cancel"){
+                        text,listener->
+                    //do nothing
+                }
+                dialog.create()
+                dialog.show()
+            }else{
+                //if not connected
+                val dialog=AlertDialog.Builder(activity as Context)
+                dialog.setTitle("Error!")
+                dialog.setMessage("No Internet Connection found")
+                dialog.setPositiveButton("Ok"){
+                        text,listener->
+                    //do nothing
+                }
+                dialog.setNegativeButton("Cancel"){
+                        text,listener->
+                    //do nothing
+                }
+                dialog.create()
+                dialog.show()
+            }
+        }
         recyclerDashboard=view.findViewById(R.id.recyclerDashboard)
         layoutManager=LinearLayoutManager(activity)
         recyclerAdapter= RecyclerDashboardAdapter(activity as Context,bookInfoList)
@@ -50,6 +89,7 @@ class DashBoardFragment : Fragment() {
         recyclerDashboard.addItemDecoration(DividerItemDecoration(
             recyclerDashboard.context,(layoutManager as LinearLayoutManager).orientation)
         )
+
         return view
     }
 
