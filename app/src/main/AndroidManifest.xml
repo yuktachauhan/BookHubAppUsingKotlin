@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.yuktachauhan.bookhub">
-    //allows to get and send data to the internet 
     <uses-permission android:name="android.permission.INTERNET"/>
-    //allows to access the connectivity status of the app i.e. we can check whether the app is connected or not
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
