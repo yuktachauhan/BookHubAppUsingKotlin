@@ -1,17 +1,19 @@
-package com.yuktachauhan.bookhub
+package com.yuktachauhan.bookhub.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Gravity
 import android.view.MenuItem
 import android.widget.FrameLayout
-import android.widget.Toast
-import android.widget.Toolbar
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
+import com.yuktachauhan.bookhub.R
+import com.yuktachauhan.bookhub.fragment.AboutAppFragment
+import com.yuktachauhan.bookhub.fragment.DashBoardFragment
+import com.yuktachauhan.bookhub.fragment.FavouritesFragment
+import com.yuktachauhan.bookhub.fragment.ProfileFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,6 +32,7 @@ class MainActivity : AppCompatActivity() {
         navigationView = findViewById(R.id.navigationView)
         coordinatorLayout = findViewById(R.id.coordinatorLayout)
         toolbar = findViewById(R.id.toolbar)
+
         setUpToolBar()
         openDashBoard()
         val actionBarDrawerToggle = ActionBarDrawerToggle(
@@ -63,21 +66,30 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.profile -> {
                     supportFragmentManager.beginTransaction()
-                        .replace(R.id.frame, ProfileFragment())
+                        .replace(
+                            R.id.frame,
+                            ProfileFragment()
+                        )
                         .commit()
                     supportActionBar?.title = "Profile"
                     drawerLayout.closeDrawers()
                 }
                 R.id.about_app -> {
                     supportFragmentManager.beginTransaction()
-                        .replace(R.id.frame, AboutAppFragment())
+                        .replace(
+                            R.id.frame,
+                            AboutAppFragment()
+                        )
                         .commit()
                     supportActionBar?.title = "About App"
                     drawerLayout.closeDrawers()
                 }
                 R.id.favourites -> {
                     supportFragmentManager.beginTransaction()
-                        .replace(R.id.frame, FavouritesFragment())
+                        .replace(
+                            R.id.frame,
+                            FavouritesFragment()
+                        )
                         .commit()
                     supportActionBar?.title = "Favourites"
                     drawerLayout.closeDrawers()
@@ -107,7 +119,10 @@ class MainActivity : AppCompatActivity() {
 
     fun openDashBoard() {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.frame, DashBoardFragment())
+            .replace(
+                R.id.frame,
+                DashBoardFragment()
+            )
             .commit()
         supportActionBar?.title = "DashBoard"
         //highlighting the dashboard icon when dashboard fragment is opened

@@ -3,14 +3,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DashBoardFragment">
+    tools:context=".fragment.DashBoardFragment">
 
     <TextView
         android:id="@+id/txtDashboard"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:text="@string/dashboard_fragment"
         android:textSize="18sp"
         android:padding="10dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerDashboard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtDashboard"
+        android:padding="10dp"
+        android:layout_margin="5dp"/>
 
 </RelativeLayout>
