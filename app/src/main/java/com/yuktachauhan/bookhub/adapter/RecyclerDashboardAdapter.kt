@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Picasso
 import com.yuktachauhan.bookhub.R
 import com.yuktachauhan.bookhub.model.Book
 
@@ -40,9 +41,11 @@ class RecyclerDashboardAdapter(val context : Context,val bookList:ArrayList<Book
         val book=bookList[position]
         holder.bookName.text=book.bookName
         holder.bookAuthor.text=book.bookAuthor
-        holder.bookCost.text=book.bookCost
-        holder.bookRatings.text=book.bookRatings
-        holder.bookImage.setImageResource(book.bookImage)
+        holder.bookCost.text=book.bookPrice
+        holder.bookRatings.text=book.bookRating
+        //holder.bookImage.setImageResource(book.bookImage)
+        //if some error occurred then we will display the default book cover image
+        Picasso.get().load(book.bookImage).error(R.drawable.default_book_cover).into(holder.bookImage)
         holder.llcontent.setOnClickListener {
             Toast.makeText(context," Clicked on ${book.bookName}",Toast.LENGTH_SHORT).show()
         }
