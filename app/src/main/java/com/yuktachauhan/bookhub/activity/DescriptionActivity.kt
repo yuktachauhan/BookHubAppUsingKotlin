@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.os.AsyncTask
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
@@ -11,10 +12,14 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.room.Room
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.squareup.picasso.Picasso
 import com.yuktachauhan.bookhub.R
+import com.yuktachauhan.bookhub.database.BookDatabase
+import com.yuktachauhan.bookhub.database.BookEntity
 import com.yuktachauhan.bookhub.util.ConnectionManager
 import okhttp3.Response
 import org.json.JSONException
@@ -87,6 +92,59 @@ class DescriptionActivity : AppCompatActivity() {
                         txtBookRating.text=bookJsonObject.getString("rating")
                         txtBookPrice.text=bookJsonObject.getString("price")
                         txtBookDesc.text=bookJsonObject.getString("description")
+
+                        //for database
+                        val bookImageUrl =bookJsonObject.getString("image")
+                        val bookEntity = BookEntity(
+                           bookId?.toInt() as Int,
+                            txtBookName.text.toString(),
+                            txtBookAuthor.text.toString(),
+                            txtBookPrice.text.toString(),
+                            txtBookRating.text.toString(),
+                            txtBookDesc.text.toString(),
+                            bookImageUrl
+                        )
+                        //checking if book is present in favourites, as we want to change the add to favourites button if book is already added
+                        val checkFav = DBAsyncTask(applicationContext,bookEntity,1).execute()
+                        val isFav = checkFav.get() //it returns true if book is there
+                        if (isFav){
+                            btnAddToFav.text="Remove From Favourites"
+                            val favColor = ContextCompat.getColor(applicationContext,R.color.colorFavourite)
+                            btnAddToFav.setBackgroundColor(favColor)
+                        }else{
+                            btnAddToFav.text="Add to  Favourites"
+                            val favColor = ContextCompat.getColor(applicationContext,R.color.colorPrimary)
+                            btnAddToFav.setBackgroundColor(favColor)
+                        }
+
+                        btnAddToFav.setOnClickListener {
+                            //if book is not in favourites add it to favourites
+                            if(!DBAsyncTask(applicationContext,bookEntity,1).execute().get()){
+                                val async = DBAsyncTask(applicationContext,bookEntity,2).execute()
+                                val result= async.get()
+                                if(result){
+                                    Toast.makeText(this@DescriptionActivity,"book added to favourites",Toast.LENGTH_SHORT).show()
+                                    btnAddToFav.text="Remove From Favourites"
+                                    val favColor = ContextCompat.getColor(applicationContext,R.color.colorFavourite)
+                                    btnAddToFav.setBackgroundColor(favColor)
+                                }else{
+                                    Toast.makeText(this@DescriptionActivity,"Some error occurred ",Toast.LENGTH_SHORT).show()
+                                }
+                            }else{
+                                //if book is  in favourites remove it from favourites
+                                val async = DBAsyncTask(applicationContext,bookEntity,3).execute()
+                                val result= async.get()
+                                if(result){
+                                    Toast.makeText(this@DescriptionActivity,"book removed from favourites",Toast.LENGTH_SHORT).show()
+                                    btnAddToFav.text="Add to  Favourites"
+                                    val favColor = ContextCompat.getColor(applicationContext,R.color.colorPrimary)
+                                    btnAddToFav.setBackgroundColor(favColor)
+                                }else{
+                                    Toast.makeText(this@DescriptionActivity,"Some error occurred ",Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+
                     }else{
                         //when success is false
                         Toast.makeText(this@DescriptionActivity,"Some error occurred ",Toast.LENGTH_SHORT).show()
@@ -130,6 +188,38 @@ class DescriptionActivity : AppCompatActivity() {
             }
             dialog.create()
             dialog.show()
+        }
+
+    }
+    class DBAsyncTask(val context: Context,val bookEntity: BookEntity,val mode:Int) : AsyncTask<Void,Void,Boolean>(){
+        /*
+        * mode 1->check db if book is favourite or not
+        * mode 2->save the book into db as favourite
+        * mode 3->remove the book from the favourite
+        * */
+        val db = Room.databaseBuilder(context,BookDatabase::class.java,"books_db").build()
+        override fun doInBackground(vararg p0: Void?): Boolean {
+            when(mode){
+                1-> {
+
+                    val book:BookEntity? =db.bookDao().getBookById(bookEntity.book_id.toString())
+                    db.close()
+                    return book!=null
+                }
+                2-> {
+
+                    db.bookDao().insertBook(bookEntity)
+                    db.close()
+                    return true
+                }
+                3-> {
+
+                    db.bookDao().deleteBook(bookEntity)
+                    db.close()
+                    return true
+                }
+            }
+            return false
         }
 
     }
