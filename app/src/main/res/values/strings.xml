@@ -20,4 +20,5 @@
     <string name="book_ratings">4.5</string>
     <string name="image_of_the_book">image of the book</string>
     <string name="check_internet_connection">Check Internet Connection</string>
+    <string name="add_to_favourites">Add To Favourites</string>
 </resources>

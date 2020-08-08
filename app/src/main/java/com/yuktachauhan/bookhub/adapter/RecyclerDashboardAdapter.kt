@@ -1,6 +1,7 @@
 package com.yuktachauhan.bookhub.adapter
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import com.yuktachauhan.bookhub.R
+import com.yuktachauhan.bookhub.activity.DescriptionActivity
 import com.yuktachauhan.bookhub.model.Book
 
 class RecyclerDashboardAdapter(val context : Context,val bookList:ArrayList<Book>)
@@ -47,7 +49,10 @@ class RecyclerDashboardAdapter(val context : Context,val bookList:ArrayList<Book
         //if some error occurred then we will display the default book cover image
         Picasso.get().load(book.bookImage).error(R.drawable.default_book_cover).into(holder.bookImage)
         holder.llcontent.setOnClickListener {
-            Toast.makeText(context," Clicked on ${book.bookName}",Toast.LENGTH_SHORT).show()
+            //Toast.makeText(context," Clicked on ${book.bookName}",Toast.LENGTH_SHORT).show()
+            val intent = Intent(context , DescriptionActivity::class.java)
+            intent.putExtra("book_id",book.bookId)
+            context.startActivity(intent)
         }
     }
 
