@@ -101,8 +101,8 @@ class DescriptionActivity : AppCompatActivity() {
                             txtBookAuthor.text.toString(),
                             txtBookPrice.text.toString(),
                             txtBookRating.text.toString(),
-                            txtBookDesc.text.toString(),
-                            bookImageUrl
+                            bookImageUrl,
+                            txtBookDesc.text.toString()
                         )
                         //checking if book is present in favourites, as we want to change the add to favourites button if book is already added
                         val checkFav = DBAsyncTask(applicationContext,bookEntity,1).execute()

@@ -6,10 +6,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
@@ -27,6 +25,7 @@ import com.yuktachauhan.bookhub.model.Book
 import com.yuktachauhan.bookhub.util.ConnectionManager
 import org.json.JSONException
 import java.util.*
+import kotlin.Comparator
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -52,7 +51,15 @@ class DashBoardFragment : Fragment() {
 //        Book("The Lord of the Rings", "J.R.R Tolkien", "Rs. 749", "5.0", R.drawable.lord_of_rings)
 //    )
 
-
+    //for sorting books rating wise
+    var ratingComparator= Comparator<Book>{book1,book2
+        ->
+        if(book1.bookRating.compareTo(book2.bookRating,true)==0){
+            book1.bookName.compareTo(book2.bookName,true)
+        }else{
+            book1.bookRating.compareTo(book2.bookRating,true)
+        }
+    }
 
     lateinit var recyclerAdapter:RecyclerDashboardAdapter
 
@@ -63,6 +70,9 @@ class DashBoardFragment : Fragment() {
         // Inflate the layout for this fragment
         //false - because we don;t want to attach this fragment permanently to the activity,we will change
         val view = inflater.inflate(R.layout.fragment_dash_board, container, false)
+
+        //to tell compiler that this fragment has options menu
+        setHasOptionsMenu(true)
 
         //progress bar visible at the time fragment is loaded
         progressBarLayout=view.findViewById(R.id.progressBarLayout)
@@ -147,16 +157,30 @@ class DashBoardFragment : Fragment() {
                         }
                     }else{
                         //when success is false
-                        Toast.makeText(activity as Context,"Some error occurred ",Toast.LENGTH_SHORT).show()
+                        if(activity!=null) {
+                            Toast.makeText(
+                                activity as Context,
+                                "Some error occurred ",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }catch (e:JSONException){
-                    Toast.makeText(activity as Context,"Some unexpected error occurred ",Toast.LENGTH_SHORT).show()
+                    if(activity!=null) {
+                        Toast.makeText(
+                            activity as Context,
+                            "Some unexpected error occurred ",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
 
             },Response.ErrorListener {
 
                 //this block handles volley errors
-                Toast.makeText(activity as Context,"Some volley error occurred ",Toast.LENGTH_SHORT).show()
+                if(activity!=null){
+                    Toast.makeText(activity as Context,"Some volley error occurred ",Toast.LENGTH_SHORT).show()
+                }
 //                //to print error in logcat
 //                println("Error is $it")
             }){
@@ -194,6 +218,21 @@ class DashBoardFragment : Fragment() {
         }
 
         return view
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater?.inflate(R.menu.menu_dashboard,menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        val id=item?.itemId
+        if(id==R.id.action_sort){
+            Collections.sort(booKInfoList,ratingComparator)
+            booKInfoList.reverse()
+        }
+        recyclerAdapter.notifyDataSetChanged()
+        return super.onOptionsItemSelected(item)
     }
 
 }
